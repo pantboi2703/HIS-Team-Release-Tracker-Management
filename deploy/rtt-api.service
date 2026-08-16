@@ -1,0 +1,25 @@
+[Unit]
+Description=Release testing tracker API
+After=network.target mongod.service
+Wants=mongod.service
+
+[Service]
+Type=simple
+User=rtt
+Group=rtt
+WorkingDirectory=/opt/rtt/backend
+EnvironmentFile=/opt/rtt/backend/.env
+ExecStart=/opt/rtt/backend/.venv/bin/uvicorn app.main:app \
+  --host 127.0.0.1 --port 8000 --workers 2 --proxy-headers
+Restart=on-failure
+RestartSec=5
+
+# The service only ever needs its own tree and the upload directory.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/rtt
+
+[Install]
+WantedBy=multi-user.target
